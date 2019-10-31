@@ -3,6 +3,7 @@ package com.hotmovies.screens.movielistmain
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.hotmovies.R
@@ -13,14 +14,13 @@ class MovieListRecyclerViewAdapter (
 
         private var movieList: List<Movie>,
 
-        private val movieListRecyclerViewOnItemClickListener: View.OnClickListener
+        private val movieListRecyclerViewOnItemClickListener: AdapterView.OnItemClickListener
 
    ) : RecyclerView.Adapter<MovieListRecyclerViewAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.movie_item_imageview, parent, false)
-        itemView.setOnClickListener(movieListRecyclerViewOnItemClickListener)
 
         return ViewHolder(itemView)
     }
@@ -42,8 +42,17 @@ class MovieListRecyclerViewAdapter (
 
             itemView: View
 
-    ) : RecyclerView.ViewHolder(itemView) {
+    ) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+
+        init {
+            itemView.setOnClickListener(this)
+        }
 
         var movieImageView: ImageView = itemView.findViewById(R.id.movieItemImageView)
+
+        override fun onClick(view: View?) {
+
+            movieListRecyclerViewOnItemClickListener.onItemClick(null, view, adapterPosition, view?.id!!.toLong())
+        }
     }
 }

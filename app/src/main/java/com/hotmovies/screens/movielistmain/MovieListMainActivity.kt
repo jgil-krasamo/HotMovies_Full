@@ -3,6 +3,7 @@ package com.hotmovies.screens.movielistmain
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.AdapterView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -12,8 +13,6 @@ import com.hotmovies.repository.tmdb.MoviesJSONParser
 import com.hotmovies.repository.tmdb.MoviesTmdbManager
 import com.hotmovies.screens.moviedetails.MovieDetailsActivity
 import kotlinx.android.synthetic.main.movie_list_main_activity.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 
 class MovieListMainActivity : AppCompatActivity() {
@@ -32,8 +31,13 @@ class MovieListMainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
-        // Retrieve the movies information
-        val data = retrieveMoviesAsync()
+        retrievePopularMovies()
+    }
+
+    private fun retrievePopularMovies() {
+
+        // Retrieve the information of popular movies
+        val data = MoviesTmdbManager.retrievePopularMoviesAsync()
 
         runBlocking {
 
@@ -44,7 +48,7 @@ class MovieListMainActivity : AppCompatActivity() {
             movieListRecyclerView.adapter = movieListRecyclerViewAdapter
 
             // If the contactList is empty, show the emptyTextView. Otherwise, show the contactListRecyclerView
-            if (movieList == null || (movieList as ArrayList<Movie>).size == 0) {
+            if (movieList == null || movieList!!.isEmpty()) {
                 movieListRecyclerView.visibility = View.GONE
                 emptyTextView.visibility = View.VISIBLE
 
@@ -55,18 +59,12 @@ class MovieListMainActivity : AppCompatActivity() {
         }
     }
 
-    private fun retrieveMoviesAsync() = GlobalScope.async {
-        MoviesTmdbManager.retrieveMovies()
-    }
-
     /** Called when the user clicks on an item of the movie list */
-    inner class MovieListRecyclerViewOnItemClickListener : View.OnClickListener {
+    inner class MovieListRecyclerViewOnItemClickListener : AdapterView.OnItemClickListener {
 
-        override fun onClick(view: View?) {
+        override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
 
-            val itemIndex = movieListRecyclerView!!.indexOfChild(view)
-
-            val movie = movieList!![itemIndex]
+            val movie = movieList!![position]
 
             val intent = Intent()
             intent.setClass(this@MovieListMainActivity, MovieDetailsActivity::class.java)
@@ -75,10 +73,8 @@ class MovieListMainActivity : AppCompatActivity() {
             intent.putExtra("movie_releaseDate", movie.releaseDate)
             intent.putExtra("movie_voteAverage", movie.voteAverage)
             intent.putExtra("movie_overview", movie.overview)
-            intent.putExtra("movie_backdropPath", movie.backdropPath)
 
             startActivity(intent)
-
         }
     }
 }

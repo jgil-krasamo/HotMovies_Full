@@ -1,5 +1,7 @@
 package com.hotmovies.repository.tmdb
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import java.io.BufferedInputStream
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -8,17 +10,21 @@ import java.net.URL
 
 object MoviesTmdbManager {
 
-    fun retrieveMovies(): String? {
+    fun retrievePopularMoviesAsync() = GlobalScope.async {
+        retrievePopularMovies()
+    }
 
-        val url = URL(MoviesTmdbDbContract.POPULAR_MOVIES_BASE_URL)
+    private fun retrievePopularMovies(): String? {
+
+        val url = URL(MoviesTmdbContract.POPULAR_MOVIES_BASE_URL)
         val httpClient = url.openConnection() as HttpURLConnection
         if (httpClient.responseCode == HttpURLConnection.HTTP_OK) {
 
             try {
 
-                val stream = BufferedInputStream(httpClient.inputStream)
+                val inputStream = BufferedInputStream(httpClient.inputStream)
 
-                return readStream(inputStream = stream)
+                return readStream(inputStream = inputStream)
 
             } catch (e: Exception) {
 
