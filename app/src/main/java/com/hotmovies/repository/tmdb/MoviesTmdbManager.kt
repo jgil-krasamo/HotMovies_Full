@@ -24,7 +24,7 @@ object MoviesTmdbManager {
 
                 val inputStream = BufferedInputStream(httpClient.inputStream)
 
-                return readStream(inputStream = inputStream)
+                return readInputStream(inputStream = inputStream)
 
             } catch (e: Exception) {
 
@@ -43,7 +43,7 @@ object MoviesTmdbManager {
         return null
     }
 
-    private fun readStream(inputStream: BufferedInputStream): String {
+    private fun readInputStream(inputStream: BufferedInputStream): String {
 
         val bufferedReader = BufferedReader(InputStreamReader(inputStream))
         val stringBuilder = StringBuilder()
